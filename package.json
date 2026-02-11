@@ -1,0 +1,52 @@
+{
+  "name": "hostfence",
+  "version": "1.2.0",
+  "description": "SSRF protection for Node.js: block private, loopback, link-local, cloud metadata, and DNS-rebinding targets before you fetch.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "keywords": [
+    "ssrf",
+    "security",
+    "url",
+    "dns-rebinding",
+    "metadata",
+    "fetch",
+    "allowlist"
+  ],
+  "author": "hon900",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hon900/hostfence.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hon900/hostfence/security"
+  },
+  "homepage": "https://github.com/hon900/hostfence",
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.2"
+  }
+}
