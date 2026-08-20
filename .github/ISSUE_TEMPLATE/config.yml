@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/hon900/hostfence/security/advisories/new
+    about: SSRF bypasses and other unfixed issues. Routed to the named Security Maintainer (@hon900).

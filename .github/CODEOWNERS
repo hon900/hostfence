@@ -1,0 +1,6 @@
+# Named maintainers. Security-sensitive paths require the security maintainer.
+* @hon900
+/src/ @hon900
+SECURITY.md @hon900
+MAINTAINERS.md @hon900
+.github/security-insights.yml @hon900
