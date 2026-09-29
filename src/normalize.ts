@@ -1,6 +1,7 @@
 import net from "node:net";
+import { domainToASCII } from "node:url";
 
-const TRAILING_DOT = /\.$/;
+const TRAILING_DOT = /\.+$/;
 
 export function normalizeHostname(hostname: string): string {
   return hostname.trim().toLowerCase().replace(TRAILING_DOT, "");
@@ -19,36 +20,15 @@ export function dwordToIPv4(n: number): string | null {
  */
 export function canonicalizeHost(hostname: string): string {
   const host = normalizeHostname(hostname);
-
-  if (host.startsWith("[") && host.endsWith("]")) {
-    return host.slice(1, -1);
+  const unwrapped = host.startsWith("[") && host.endsWith("]") ? host.slice(1, -1) : host;
+  if (net.isIPv6(unwrapped) && !unwrapped.includes("%")) {
+    return new URL(`http://[${unwrapped}]/`).hostname.slice(1, -1);
   }
-
-  if (/^\d+$/.test(host)) {
-    const dotted = dwordToIPv4(Number(host));
-    if (dotted) {
-      return dotted;
-    }
+  // Use the same WHATWG normalization as URL: IDNA, short IPv4, hex and octal.
+  // Reject delimiters here so this hostname helper never parses a URL or userinfo.
+  if (host && !/[\s/:?#@\\\[\]]/.test(host)) {
+    return normalizeHostname(domainToASCII(host)) || host;
   }
-
-  if (/^0x[0-9a-f]+$/i.test(host)) {
-    const dotted = dwordToIPv4(Number.parseInt(host, 16));
-    if (dotted) {
-      return dotted;
-    }
-  }
-
-  if (/^0[0-7]+$/.test(host)) {
-    const dotted = dwordToIPv4(Number.parseInt(host, 8));
-    if (dotted) {
-      return dotted;
-    }
-  }
-
-  if (net.isIP(host)) {
-    return host;
-  }
-
   return host;
 }
 
