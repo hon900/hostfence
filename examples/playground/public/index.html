@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Inspect URL policies with the real Hostfence engine using deterministic, offline DNS fixtures.">
+  <title>Hostfence · Policy playground</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to playground</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Hostfence home"><span class="brand-mark" aria-hidden="true">h/</span>hostfence</a>
+    <nav aria-label="Main navigation"><a href="#playground">Playground</a><a href="#scenarios">Scenarios</a><a href="https://github.com/hon900/hostfence">Source ↗</a></nav>
+  </header>
+  <main id="main">
+    <section class="intro">
+      <p class="eyebrow">NODE.JS · OUTBOUND URL SECURITY</p>
+      <h1>A URL is input.<br><span>Trust is a decision.</span></h1>
+      <p class="intro-copy">See what leaves your application. Inspect addresses, explore policy, and understand every blocked request.</p>
+    </section>
+
+    <section id="playground" class="workbench" aria-labelledby="playground-title">
+      <div class="bench-heading"><h2 id="playground-title">Policy playground</h2><span class="mode-label">Offline fixtures</span></div>
+      <div class="bench-grid">
+        <form id="check-form" class="request-pane">
+          <label for="url">Destination URL</label>
+          <div class="url-field"><input id="url" name="url" type="text" spellcheck="false" autocomplete="off" maxlength="2048" required value="http://169.254.169.254/latest/meta-data/" aria-describedby="fixture-note"></div>
+          <div class="presets" aria-label="Example URLs"><button type="button" data-scenario="public">Public URL</button><button type="button" data-scenario="metadata" aria-pressed="true">Metadata</button><button type="button" data-scenario="mixed">Mixed DNS</button><button type="button" data-scenario="mapped">Mapped IPv6</button></div>
+          <label for="profile">Policy profile</label>
+          <select id="profile" name="profile"><option value="default">Public internet</option><option value="webhook">Webhook delivery</option></select>
+          <p id="policy-description" class="field-help">Default protection for user-supplied URLs.</p>
+          <button id="check-button" type="submit" class="primary">Inspect URL <span aria-hidden="true">↗</span></button>
+          <p id="fixture-note" class="fixture-note">Real validation engine. Fixed DNS answers.<br>No target is contacted, and nothing is saved.</p>
+          <p id="form-error" class="error" role="alert" hidden></p>
+        </form>
+
+        <div class="result-pane" id="result-pane" aria-live="polite" aria-busy="false">
+          <div class="result-heading"><span>VERDICT</span><span id="elapsed">Ready to inspect</span></div>
+          <div id="verdict" class="verdict empty">Awaiting input</div>
+          <p id="decision-detail" class="decision-detail">Run an inspection to see how the policy evaluates your destination.</p>
+          <dl class="result-facts"><div><dt>Normalized host</dt><dd id="result-host">Not inspected</dd></div><div><dt>Address source</dt><dd id="result-source">Offline DNS fixtures / IP literals</dd></div></dl>
+          <div class="address-heading">Resolved addresses</div>
+          <div id="addresses" class="addresses"><p class="muted">No addresses yet.</p></div>
+          <details id="json-details"><summary>Structured result <span aria-hidden="true">{ }</span></summary><pre id="json-result">Run an inspection to view JSON.</pre><button id="copy-button" class="text-button" type="button" disabled>Copy JSON</button></details>
+        </div>
+      </div>
+      <div class="bench-footer"><span>Parse & normalize</span><span aria-hidden="true">→</span><span>Apply policy</span><span aria-hidden="true">→</span><span>Resolve & classify</span><span aria-hidden="true">→</span><span>Allow or block</span></div>
+    </section>
+
+    <section id="scenarios" class="scenario-section" aria-labelledby="scenarios-title">
+      <div class="section-heading"><div><h2 id="scenarios-title">Small inputs. Real boundaries.</h2><p>A repeatable set of destinations that exercise the default policy.</p></div><button type="button" id="run-suite" class="secondary">Run all scenarios</button></div>
+      <p id="suite-summary" class="suite-summary" aria-live="polite">Choose a scenario to inspect it, or run the full set.</p>
+      <div id="scenario-list" class="scenario-list" aria-label="Security scenarios"><p class="muted">Loading scenarios…</p></div>
+    </section>
+
+    <aside class="boundary-note"><span class="boundary-label">The security boundary</span><p>Hostfence checks a URL and its DNS answers before a request. Your HTTP client must also enforce redirects and bind connections to validated addresses. A preflight check alone does not prevent DNS changes between validation and connection.</p><a href="https://github.com/hon900/hostfence/blob/main/SECURITY.md">Read the threat model ↗</a></aside>
+  </main>
+  <footer><span>hostfence / <a href="https://github.com/hon900/hostfence/blob/main/MAINTAINERS.md">maintained by @hon900</a></span><span>Node.js · TypeScript · MIT</span></footer>
+</body>
+</html>

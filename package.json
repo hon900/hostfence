@@ -1,7 +1,7 @@
 {
   "name": "hostfence",
-  "version": "1.2.0",
-  "description": "SSRF protection for Node.js: block private, loopback, link-local, cloud metadata, and DNS-rebinding targets before you fetch.",
+  "version": "1.3.0",
+  "description": "SSRF preflight validation for Node.js: inspect URLs, DNS answers, address ranges, and destination policies before you fetch.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,7 +21,8 @@
     "build": "tsc",
     "prepare": "tsc",
     "prepublishOnly": "npm run build",
-    "test": "npm run build && node --test test/*.test.js"
+    "test": "npm run build && node --test test/*.test.js",
+    "demo": "npm run build && node examples/playground/server.js"
   },
   "engines": {
     "node": ">=18.18.0"
