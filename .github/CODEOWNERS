@@ -1,6 +1,9 @@
-# Named maintainers. Security-sensitive paths require the security maintainer.
+# Review ownership for the individual maintainer.
+# This requests reviews; approval is required only when repository rules enforce it.
 * @hon900
 /src/ @hon900
-SECURITY.md @hon900
-MAINTAINERS.md @hon900
-.github/security-insights.yml @hon900
+/test/ @hon900
+/SECURITY.md @hon900
+/MAINTAINERS.md @hon900
+/GOVERNANCE.md @hon900
+/.github/ @hon900

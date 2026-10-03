@@ -1,10 +1,10 @@
 header:
   schema-version: 1.0.0
-  last-updated: "2026-07-16"
-  last-reviewed: "2026-09-28"
+  last-updated: "2026-10-03"
+  last-reviewed: "2026-10-03"
   url: https://github.com/hon900/hostfence/security/policy
   comment: |
-    Named security-maintainer contact for hostfence. Reports go through
+    Individual security-maintainer contact for hostfence. Reports go through
     GitHub Private Vulnerability Reporting and are triaged by the role below.
 
 project-lifecycle:
@@ -20,7 +20,7 @@ security-contacts:
   - type: github
     value: hon900
     primary: true
-    comment: Lead Security Maintainer
+    comment: Individual Security Maintainer; general maintenance contact is hongoo@fastmail.com
 
 vulnerability-reporting:
   reports-accepted: true
