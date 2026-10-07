@@ -12,8 +12,9 @@ export type CheckResult = {
   ok: boolean;
   url: URL;
   hostname: string;
+  /** Policy evidence: DNS/IP-literal addresses plus hostname-embedded hints. */
   addresses: string[];
-  /** Set when every collected address is allowed. Bind the TCP connection to this. */
+  /** A DNS answer or IP literal, set only when all policy evidence is allowed. */
   pin: DestinationPin | null;
   reasons: string[];
 };
@@ -72,10 +73,11 @@ export class Hostfence {
     }
 
     const encoded = hostnameEmbeddedIPs(normalized);
-    let addresses: string[] = net.isIP(hostname) ? [hostname] : [...encoded];
+    let resolvedAddresses: string[] = net.isIP(hostname) ? [hostname] : [];
+    let addresses: string[] = [...new Set([...resolvedAddresses, ...encoded])];
     const encodedBlocked = encoded.some((ip) => {
       const cls = classifyAddress(ip);
-      return cls === "invalid" || classBlocked(cls, this.policy) !== null;
+      return cls === "invalid" || this.matchesExtraDenied(ip) || classBlocked(cls, this.policy) !== null;
     });
 
     const skipDns = net.isIP(hostname) || reasons.length > 0 || encodedBlocked;
@@ -86,7 +88,8 @@ export class Hostfence {
         if (!Array.isArray(records) || Array.from(records).some((address) => typeof address !== "string")) {
           reasons.push("DNS lookup returned an invalid address list");
         } else {
-          addresses = [...new Set([...addresses, ...records])];
+          resolvedAddresses = [...new Set(records)];
+          addresses = [...new Set([...addresses, ...resolvedAddresses])];
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -94,11 +97,6 @@ export class Hostfence {
       }
     }
 
-    if (addresses.length === 0 && reasons.length === 0) {
-      reasons.push("hostname resolved to no addresses");
-    }
-
-    const allowedAddresses: string[] = [];
     for (const address of addresses) {
       const cls = classifyAddress(address);
       if (cls === "invalid") {
@@ -114,14 +112,17 @@ export class Hostfence {
         reasons.push(`${address} is a ${blocked}`);
         continue;
       }
-      allowedAddresses.push(address);
+    }
+
+    if (resolvedAddresses.length === 0 && reasons.length === 0) {
+      reasons.push("hostname resolved to no addresses");
     }
 
     const uniqueReasons = [...new Set(reasons)];
     const ok = uniqueReasons.length === 0;
     const pin =
-      ok && allowedAddresses[0] !== undefined && port !== undefined
-        ? makePin(allowedAddresses[0], port, normalized)
+      ok && resolvedAddresses[0] !== undefined && port !== undefined
+        ? makePin(resolvedAddresses[0], port, normalized)
         : null;
 
     return {

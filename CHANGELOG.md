@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1 — 2026-10-07
+
+- Pin wildcard DNS hostnames to an actual verified DNS answer instead of an IP inferred from the hostname.
+- Reject empty DNS answers even when the hostname embeds a permitted address.
+- Apply additional denied CIDRs to hostname-embedded evidence before DNS, preserving early rejection without treating that evidence as a connection destination.
+
 ## 1.4.0 — 2026-10-07
 
 - Return a `DestinationPin` from `check()` / `assertPin()` so transports can bind TCP to the verified address (SNI and Host stay on the original name).

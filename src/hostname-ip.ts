@@ -10,7 +10,8 @@ function zoneOf(hostname: string, zone: string): boolean {
 
 /**
  * IPs that some public wildcard DNS products encode in the hostname itself.
- * Callers must treat these as resolved addresses even before a DNS lookup.
+ * These are policy evidence for early rejection, never verified DNS answers
+ * or connection destinations. Allowed names still require a DNS lookup.
  */
 export function hostnameEmbeddedIPs(hostname: string): string[] {
   const host = hostname.toLowerCase();

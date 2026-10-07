@@ -39,7 +39,7 @@ suite.
 ## Install
 
 ```bash
-npm install github:hon900/hostfence#v1.4.0
+npm install github:hon900/hostfence#v1.4.1
 ```
 
 The tag pins the reviewed source and builds the TypeScript package at install
@@ -85,6 +85,12 @@ Malformed URLs still throw `HostfenceError` with code `HOSTFENCE_INVALID_URL`.
 DNS failures, timeouts, empty answers, and malformed resolver responses yield
 `ok: false`. Already-rejected hostnames are not looked up. Duplicate DNS answers
 and rejection reasons are removed.
+
+`addresses` contains all address evidence checked by the policy, including IPs
+encoded in wildcard DNS names such as `8.8.8.8.nip.io`. Those hostname hints
+can reject a destination but cannot authorize a connection. `pin.address`
+always comes from a successful DNS answer or an IP literal in the URL; an
+empty DNS response is rejected even when the hostname embeds a permitted IP.
 
 ## Policy reference
 

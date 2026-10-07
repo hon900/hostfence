@@ -104,6 +104,57 @@ describe("SSRF bypass corpus", () => {
     assert.equal(pin.servername, "dns.example");
   });
 
+  it("pins the DNS answer rather than a public address embedded in the hostname", async () => {
+    const local = new Hostfence({ lookup: async () => ["1.1.1.1", "8.8.4.4"] });
+    const result = await local.check("https://8.8.8.8.nip.io/query");
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.addresses, ["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+    assert.deepEqual(result.pin, {
+      address: "1.1.1.1",
+      family: 4,
+      port: 443,
+      servername: "8.8.8.8.nip.io",
+    });
+  });
+
+  it("rejects empty DNS answers despite a public hostname-embedded address", async () => {
+    const local = new Hostfence({ lookup: async () => [] });
+    const result = await local.check("https://8-8-8-8.sslip.io/");
+    assert.equal(result.ok, false);
+    assert.equal(result.pin, null);
+    assert.deepEqual(result.reasons, ["hostname resolved to no addresses"]);
+    await assert.rejects(() => local.assertPin("https://8-8-8-8.sslip.io/"), HostfenceError);
+  });
+
+  it("requires a DNS answer even when a hostname's loopback hint is explicitly allowed", async () => {
+    const local = new Hostfence({ allowLoopback: true, lookup: async () => [] });
+    const result = await local.check("http://localtest.me/");
+    assert.equal(result.ok, false);
+    assert.equal(result.pin, null);
+    assert.deepEqual(result.reasons, ["hostname resolved to no addresses"]);
+  });
+
+  it("rejects denied hostname-embedded evidence before calling DNS", async () => {
+    let calls = 0;
+    const local = new Hostfence({
+      extraDeniedCidrs: ["8.8.8.0/24"],
+      lookup: async () => { calls += 1; return ["1.1.1.1"]; },
+    });
+    const result = await local.check("https://8.8.8.8.nip.io/");
+    assert.equal(result.ok, false);
+    assert.equal(result.pin, null);
+    assert.deepEqual(result.reasons, ["8.8.8.8 matches an extra denied CIDR"]);
+    assert.equal(calls, 0);
+  });
+
+  it("checks actual DNS answers even when a hostname embeds a permitted address", async () => {
+    const local = new Hostfence({ lookup: async () => ["1.1.1.1", "10.0.0.5"] });
+    const result = await local.check("https://8.8.8.8.nip.io/");
+    assert.equal(result.ok, false);
+    assert.equal(result.pin, null);
+    assert.ok(result.reasons.some((reason) => reason.includes("10.0.0.5")));
+  });
+
   it("refuses to pin when any DNS answer is internal", async () => {
     const local = new Hostfence({ lookup: async () => ["1.1.1.1", "10.0.0.5"] });
     await assert.rejects(() => local.assertPin("https://rebinder.example/"), HostfenceError);

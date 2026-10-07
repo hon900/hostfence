@@ -1,6 +1,6 @@
 {
   "name": "hostfence",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "SSRF preflight validation for Node.js: inspect URLs, DNS answers, address ranges, and destination policies before you fetch.",
   "type": "module",
   "main": "./dist/index.js",
