@@ -37,7 +37,7 @@ Credentials are rejected by default. `allowedPorts`, when provided, uses the eff
 | Undici interceptor | Per-dispatch origin checks and handler error delivery | Path/header authorization, socket DNS pinning or downstream backpressure propagation while validation is queued |
 | CLI | Repeatable decisions, machine-readable output and exit codes | Sending requests |
 
-DNS may change after validation and before a separate client lookup. A complete deployment must bind its connection to the validated address, maintain TLS hostname verification, check each redirect, and apply network-level egress controls. The default resolver's timeout stops waiting; it cannot cancel operating-system resolver work. Do not cache authorization decisions across unrelated requests.
+DNS may change after validation and before a separate client lookup. `check()` / `assertPin()` return a `DestinationPin`; transports must dial that address with `pinLookup()` so SNI and Host stay on the original name. Check each redirect with `checkHop()`, and keep network-level egress controls. The default resolver's timeout stops waiting; it cannot cancel operating-system resolver work. Do not cache authorization decisions across unrelated requests.
 
 ## Reproducible playground
 

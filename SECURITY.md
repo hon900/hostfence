@@ -8,10 +8,11 @@ not open the application's HTTP connection or control its transport.
 
 - **DNS changes:** a subsequent HTTP client may resolve the hostname again and
   receive different addresses. `assert(url)` followed by ordinary `fetch(url)`
-  does not close this time-of-check/time-of-use gap. Enforce the policy in the
-  connection's resolver/dialer, or use an egress proxy/firewall. If pinning an
-  approved IP, preserve the original hostname for HTTP Host, TLS SNI, and
-  certificate verification; never disable TLS verification to make pinning work.
+  does not close this time-of-check/time-of-use gap. Use `assertPin()` and pass
+  `pinLookup(pin)` to the client's dialer (undici `connect.lookup`) so TCP
+  targets the verified address while HTTP Host, TLS SNI, and certificate
+  verification keep the original hostname. Never disable TLS verification to
+  make pinning work. An egress proxy/firewall remains the deployment control.
 - **Redirects:** disable automatic redirects. If the application needs them,
   validate and enforce every hop, bound the hop count, and avoid forwarding
   credentials across origins.

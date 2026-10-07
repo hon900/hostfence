@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.0 — 2026-10-07
+
+- Return a `DestinationPin` from `check()` / `assertPin()` so transports can bind TCP to the verified address (SNI and Host stay on the original name).
+- Export `pinLookup()` for undici `Agent({ connect: { lookup } })`.
+- Unwrap NAT64 `64:ff9b::/96` and 6to4 `2002::/16` and classify the embedded IPv4.
+- Treat hostname-encoded addresses (`nip.io`, `sslip.io`, `xip.io`, `localtest.me`, `lvh.me`, `vcap.me`) as resolved answers before DNS.
+- Classify Azure wire server `168.63.129.16`, AWS IPv6 IMDS `fd00:ec2::254`, and Teredo `2001::/32`.
+- Dual-stack extra-denied CIDRs: IPv4 rules match IPv4-mapped IPv6 and the reverse.
+- Add `checkHop()` for redirect Location checks.
+- Expand the SSRF bypass corpus (dword/octal/short IPv4, mapped/NAT64/6to4, wildcard DNS, metadata).
+
 ## 1.3.0 — 2026-10-03
 
 - Reject malformed DNS responses, scoped addresses, and stalled lookups; deduplicate DNS records.

@@ -16,7 +16,7 @@ The declared release dependency uses a pinned GitHub tag:
 
 ```json
 "dependencies": {
-  "hostfence": "github:hon900/hostfence#v1.3.0"
+  "hostfence": "github:hon900/hostfence#v1.4.0"
 }
 ```
 

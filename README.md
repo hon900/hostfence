@@ -17,11 +17,11 @@ review, private vulnerability intake, regression evidence and release checks.
 The [security review](docs/security-review.md) records the rationale behind the
 current hardening work; [architecture](docs/architecture.md) explains its limits.
 
-> **Security boundary:** this is a preflight check. It does not bind a later
-> HTTP connection to the checked IP addresses, so `assert(url); fetch(url)`
-> alone does **not** prevent DNS changes between validation and connection.
-> Disable redirects, and use connection-level address validation or an egress
-> proxy/firewall for enforcement. See [SECURITY.md](SECURITY.md).
+> **Security boundary:** `assert()` is a preflight. DNS can change between
+> the check and `fetch(url)` unless the client connects to `result.pin`.
+> `assertPin()` plus `pinLookup()` bind TCP to the verified address while
+> keeping TLS SNI and the Host header on the original name. Disable automatic
+> redirects and re-check every hop with `checkHop()`. See [SECURITY.md](SECURITY.md).
 
 ## Try the policy lab
 
@@ -39,7 +39,7 @@ suite.
 ## Install
 
 ```bash
-npm install github:hon900/hostfence#v1.3.0
+npm install github:hon900/hostfence#v1.4.0
 ```
 
 The tag pins the reviewed source and builds the TypeScript package at install
@@ -58,10 +58,9 @@ const fence = new Hostfence({
 });
 
 try {
-  const target = await fence.assert("https://api.partner.example/events");
-  // target is a normalized URL. Only connect through a transport that also
-  // enforces your destination policy at connection time.
-  console.log(target.hostname);
+  const { url, pin } = await fence.assertPin("https://api.partner.example/events");
+  // Connect to pin.address (family pin.family) with SNI/Host pin.servername.
+  console.log(url.hostname, pin);
 } catch (err) {
   if (err instanceof HostfenceError) console.error(err.reasons);
   else throw err;

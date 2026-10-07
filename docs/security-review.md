@@ -44,10 +44,10 @@ establish independent adoption or production deployment history.
 
 ## Explicitly unresolved at this layer
 
-DNS preflight does not pin the destination of a later HTTP connection. Passing
-all tests cannot close that transport gap. Proxy routing, NAT64, public
-redirectors, TLS enforcement, application authorization and deployment egress
-rules remain integration concerns. See [SECURITY.md](../SECURITY.md).
+`assert()` alone does not pin a later HTTP connection. `assertPin()` plus
+`pinLookup()` close the DNS TOCTOU for clients that honor the pin. Proxy
+routing, public redirectors, TLS enforcement, application authorization and
+deployment egress rules remain integration concerns. See [SECURITY.md](../SECURITY.md).
 
 ## Reproduce the review
 
