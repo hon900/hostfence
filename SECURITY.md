@@ -52,7 +52,7 @@ are documented in [the runbook](docs/maintainer-runbook.md).
 
 | Role | GitHub | Scope |
 | --- | --- | --- |
-| Lead Security Maintainer | [@hon900](https://github.com/hon900) | Advisories, private reports, `src/` review, `SECURITY.md` |
+| Security Maintainer | [@hon900](https://github.com/hon900) | Advisories, private reports, `src/` review, `SECURITY.md` |
 
 The role is also recorded in:
 
@@ -79,8 +79,9 @@ and to ship a fix or advisory within 30 days for confirmed bypasses.
 
 | Version | Supported |
 | --- | --- |
-| 1.3.x | Yes |
-| 1.0.x–1.2.x | Upgrade to the latest 1.x release; no separate backport branch |
+| 1.4.1 and later fixes on the latest 1.x line | Yes |
+| 1.4.0 | Upgrade to 1.4.1; see the [DNS pinning case study](docs/research/hostname-evidence-vs-dns-pinning.md) |
+| 1.0.x–1.3.x | Upgrade to the latest 1.x release; no separate backport branch |
 | < 1.0 | No |
 
 Support is maintained by one person. Security changes are shipped on the latest

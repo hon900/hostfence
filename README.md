@@ -1,7 +1,6 @@
 # hostfence
 
 [![ci](https://github.com/hon900/hostfence/actions/workflows/ci.yml/badge.svg)](https://github.com/hon900/hostfence/actions/workflows/ci.yml)
-[![security maintainer](https://img.shields.io/badge/security%20maintainer-hon900-0a7)](https://github.com/hon900/hostfence/blob/main/MAINTAINERS.md)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Know where a URL points before your server requests it.**
@@ -11,17 +10,41 @@ It normalizes unusual address encodings, inspects every resolved address, and
 returns readable rejection reasons. Use it at webhook, preview, and import
 boundaries that accept a URL from a user.
 
-Maintained by [@hon900](https://github.com/hon900), the project's named Security
-Maintainer. The [maintainer runbook](docs/maintainer-runbook.md) connects policy
-review, private vulnerability intake, regression evidence and release checks.
-The [security review](docs/security-review.md) records the rationale behind the
-current hardening work; [architecture](docs/architecture.md) explains its limits.
+Maintained by [@hon900](https://github.com/hon900), with a focus on SSRF defense,
+DNS validation, and the gap between a policy decision and an actual connection.
+The [research notes](docs/research/README.md) reproduce implementation failures
+against fixed source revisions. The [architecture](docs/architecture.md) and
+[maintainer runbook](docs/maintainer-runbook.md) explain the protection boundary
+and release process.
 
 > **Security boundary:** `assert()` is a preflight. DNS can change between
 > the check and `fetch(url)` unless the client connects to `result.pin`.
-> `assertPin()` plus `pinLookup()` bind TCP to the verified address while
-> keeping TLS SNI and the Host header on the original name. Disable automatic
-> redirects and re-check every hop with `checkHop()`. See [SECURITY.md](SECURITY.md).
+> `assertPin()` returns a checked address; install `pinLookup()` in the client's
+> actual socket connector and retain the original Host/TLS identity. The
+> [fetch wrapper](https://github.com/hon900/hostfence-fetch/tree/v1.3.1) and
+> [owned Undici agent](https://github.com/hon900/undici-ssrf/tree/v0.9.1) implement
+> that integration. Disable automatic redirects and re-check every hop with
+> `checkHop()`. See [SECURITY.md](SECURITY.md).
+
+## Research: from a checked URL to a verified connection
+
+| Case study | Finding | Evidence |
+| --- | --- | --- |
+| [Hostname evidence is not a DNS answer](docs/research/hostname-evidence-vs-dns-pinning.md) | A hostname-derived IP could become a connection pin without being returned by DNS. | Compare hostfence 1.4.0 and 1.4.1 with deterministic resolver fixtures. |
+| [A dispatch option is not a socket connector](docs/research/undici-dispatch-vs-connect.md) | The adapter supplied a pinned lookup at a layer Undici did not use to connect. | Compare the historical adapter commit with 0.9.1 using controlled local sockets. |
+
+Each report includes the tested revisions, a minimal reproducer, before/after
+results, and limits on the conclusion. These are investigations of this
+maintainer's own code; known SSRF techniques are distinguished from the specific
+implementation defects. Start with the [research guide and Korean summary](docs/research/README.md).
+
+```sh
+npm run research:install
+npm run research
+```
+
+Installation downloads locked dependencies from GitHub/npm. The experiments
+use injected DNS answers and local fixtures; they do not probe external targets.
 
 ## Try the policy lab
 
@@ -109,13 +132,16 @@ empty DNS response is rejected even when the hostname embeds a permitted IP.
 | `allowLinkLocal` | `false` | Permit link-local ranges, including link-local metadata IPs. |
 | `allowUniqueLocal` | `false` | Permit IPv6 ULA. |
 | `allowCgnat` | `false` | Permit shared IPv4 space, except the separately classified metadata IP. |
-| `allowMetadata` | `false` | Permit listed metadata hostnames and `100.100.100.200`; other hostname/address checks still apply. |
+| `allowMetadata` | `false` | Permit listed metadata hostnames and classified metadata addresses (`100.100.100.200`, `168.63.129.16`, `fd00:ec2::254`); other policy checks still apply. |
 
 Host lists use the same normalization as request URLs: case, surrounding
 whitespace, trailing dots, IDNA, unusual IPv4 representations, and IPv6
 compression. Supply hostnames or IP addresses, without schemes, ports, paths,
 or wildcards. Checks remain cumulative; an allow list never bypasses address
 restrictions. Use all opt-in flags narrowly.
+
+Link-local destinations such as `169.254.169.254` remain governed by
+`allowLinkLocal`; `allowMetadata` alone does not permit them.
 
 Timeouts stop waiting for DNS but cannot cancel an OS lookup or an injected
 resolver. A custom resolver must remain asynchronous; a blocked JavaScript
@@ -124,7 +150,8 @@ thread cannot be interrupted by the timeout.
 ## Default address coverage
 
 - Loopback, RFC1918, link-local, CGNAT, IPv6 ULA, unspecified, and multicast.
-- Cloud metadata names and Alibaba metadata `100.100.100.200`.
+- Cloud metadata names, Alibaba `100.100.100.200`, Azure wire-server
+  `168.63.129.16`, and AWS IPv6 metadata `fd00:ec2::254`.
 - IPv4 documentation and benchmark ranges, reserved `192.0.0.0/24` and `240/4`.
 - IPv6 documentation (`2001:db8::/32`, `3fff::/20`), benchmark `2001:2::/48`,
   discard-only/dummy ranges, local-use translation, and SRv6 SID space.
@@ -144,7 +171,6 @@ Run `npm test` to compile TypeScript and execute the offline regression suite.
 Tests cover encoded IPv4, IPv6 equivalence, range boundaries, malformed DNS,
 configuration errors, hostname normalization, and timeout behavior.
 
-The named **Lead Security Maintainer** is [@hon900](https://github.com/hon900).
 See [SECURITY.md](SECURITY.md), [MAINTAINERS.md](MAINTAINERS.md), and
 [ADOPTION.md](ADOPTION.md). Report suspected bypasses through
 [private vulnerability reporting](https://github.com/hon900/hostfence/security/advisories/new).

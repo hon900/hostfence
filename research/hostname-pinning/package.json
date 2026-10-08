@@ -1,0 +1,17 @@
+{
+  "name": "hostfence-hostname-pinning-reproduction",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline before-and-after fixture for hostname evidence used as a destination pin.",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "scripts": {
+    "test": "node reproduce.mjs"
+  },
+  "dependencies": {
+    "hostfence-before": "github:hon900/hostfence#4df230828e7a8b3055c9ffba8ff2b982be313a03",
+    "hostfence-after": "github:hon900/hostfence#3d450931930a5a69f97b6ef27eb9b3f527b3d862"
+  }
+}

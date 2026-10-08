@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "study": "hostname-evidence-vs-dns-pinning",
+  "generatedAt": "2026-10-08T02:50:08.317Z",
+  "runtime": {
+    "node": "v18.20.8",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "method": "Injected resolver fixtures only; no HTTP requests or public DNS queries during this program.",
+  "dependencies": {
+    "before": {
+      "package": "hostfence",
+      "version": "1.4.0",
+      "commit": "4df230828e7a8b3055c9ffba8ff2b982be313a03",
+      "resolved": "git+ssh://git@github.com/hon900/hostfence.git#4df230828e7a8b3055c9ffba8ff2b982be313a03",
+      "workspaceLink": false
+    },
+    "after": {
+      "package": "hostfence",
+      "version": "1.4.1",
+      "commit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+      "resolved": "git+ssh://git@github.com/hon900/hostfence.git#3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+      "workspaceLink": false
+    }
+  },
+  "result": "PASS",
+  "caseCount": 6,
+  "results": [
+    {
+      "id": "hint-differs-from-dns",
+      "url": "https://8.8.8.8.nip.io/",
+      "injectedDnsAnswers": [
+        "1.1.1.1"
+      ],
+      "before": {
+        "ok": true,
+        "addresses": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "pin": {
+          "address": "8.8.8.8",
+          "family": 4,
+          "port": 443,
+          "servername": "8.8.8.8.nip.io"
+        },
+        "reasons": [],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": false
+      },
+      "after": {
+        "ok": true,
+        "addresses": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "pin": {
+          "address": "1.1.1.1",
+          "family": 4,
+          "port": 443,
+          "servername": "8.8.8.8.nip.io"
+        },
+        "reasons": [],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": true
+      }
+    },
+    {
+      "id": "empty-dns-with-public-hint",
+      "url": "https://8-8-8-8.sslip.io/",
+      "injectedDnsAnswers": [],
+      "before": {
+        "ok": true,
+        "addresses": [
+          "8.8.8.8"
+        ],
+        "pin": {
+          "address": "8.8.8.8",
+          "family": 4,
+          "port": 443,
+          "servername": "8-8-8-8.sslip.io"
+        },
+        "reasons": [],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": false
+      },
+      "after": {
+        "ok": false,
+        "addresses": [
+          "8.8.8.8"
+        ],
+        "pin": null,
+        "reasons": [
+          "hostname resolved to no addresses"
+        ],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": null
+      }
+    },
+    {
+      "id": "private-dns-answer",
+      "url": "https://8.8.8.8.nip.io/",
+      "injectedDnsAnswers": [
+        "127.0.0.1"
+      ],
+      "before": {
+        "ok": false,
+        "addresses": [
+          "8.8.8.8",
+          "127.0.0.1"
+        ],
+        "pin": null,
+        "reasons": [
+          "127.0.0.1 is a loopback address"
+        ],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": null
+      },
+      "after": {
+        "ok": false,
+        "addresses": [
+          "8.8.8.8",
+          "127.0.0.1"
+        ],
+        "pin": null,
+        "reasons": [
+          "127.0.0.1 is a loopback address"
+        ],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": null
+      }
+    },
+    {
+      "id": "mixed-public-private-dns",
+      "url": "https://8.8.8.8.nip.io/",
+      "injectedDnsAnswers": [
+        "1.1.1.1",
+        "10.0.0.5"
+      ],
+      "before": {
+        "ok": false,
+        "addresses": [
+          "8.8.8.8",
+          "1.1.1.1",
+          "10.0.0.5"
+        ],
+        "pin": null,
+        "reasons": [
+          "10.0.0.5 is a private address"
+        ],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": null
+      },
+      "after": {
+        "ok": false,
+        "addresses": [
+          "8.8.8.8",
+          "1.1.1.1",
+          "10.0.0.5"
+        ],
+        "pin": null,
+        "reasons": [
+          "10.0.0.5 is a private address"
+        ],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": null
+      }
+    },
+    {
+      "id": "private-hostname-hint",
+      "url": "https://127.0.0.1.nip.io/",
+      "injectedDnsAnswers": [
+        "1.1.1.1"
+      ],
+      "before": {
+        "ok": false,
+        "addresses": [
+          "127.0.0.1"
+        ],
+        "pin": null,
+        "reasons": [
+          "127.0.0.1 is a loopback address"
+        ],
+        "lookupCalls": 0,
+        "pinMatchesInjectedDns": null
+      },
+      "after": {
+        "ok": false,
+        "addresses": [
+          "127.0.0.1"
+        ],
+        "pin": null,
+        "reasons": [
+          "127.0.0.1 is a loopback address"
+        ],
+        "lookupCalls": 0,
+        "pinMatchesInjectedDns": null
+      }
+    },
+    {
+      "id": "ordinary-public-dns",
+      "url": "https://ordinary.invalid/",
+      "injectedDnsAnswers": [
+        "1.1.1.1"
+      ],
+      "before": {
+        "ok": true,
+        "addresses": [
+          "1.1.1.1"
+        ],
+        "pin": {
+          "address": "1.1.1.1",
+          "family": 4,
+          "port": 443,
+          "servername": "ordinary.invalid"
+        },
+        "reasons": [],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": true
+      },
+      "after": {
+        "ok": true,
+        "addresses": [
+          "1.1.1.1"
+        ],
+        "pin": {
+          "address": "1.1.1.1",
+          "family": 4,
+          "port": 443,
+          "servername": "ordinary.invalid"
+        },
+        "reasons": [],
+        "lookupCalls": 1,
+        "pinMatchesInjectedDns": true
+      }
+    }
+  ]
+}

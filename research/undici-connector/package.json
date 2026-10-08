@@ -1,0 +1,22 @@
+{
+  "name": "hostfence-research-undici-connector",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Loopback-only comparison of historical request-level lookup and fixed Undici connector enforcement.",
+  "scripts": {
+    "test": "node reproduce.mjs"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "hostfence": "github:hon900/hostfence#3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+    "undici": "6.29.0",
+    "undici-ssrf-before": "github:hon900/undici-ssrf#babdbe5e3f8071eab991014969f0c1c572d47d7c",
+    "undici-ssrf-after": "github:hon900/undici-ssrf#7909f718c9302c053508a1a51cce2c339aa0e7b0"
+  },
+  "overrides": {
+    "hostfence": "$hostfence"
+  }
+}

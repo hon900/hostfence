@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "researchDate": "2026-10-08",
+  "researchTimezone": "Asia/Seoul",
+  "recordedAtUtc": "2026-10-08 02:49:47 UTC",
+  "captureMethod": "Actual JSON stdout from npm --silent test after successful npm ci in two isolated standalone directories. Tests do not modify this snapshot.",
+  "installVerification": [
+    {
+      "node": "v18.20.8",
+      "command": "npx --yes --package=node@18 --package=npm@10 npm ci --no-audit --no-fund",
+      "exitCode": 0,
+      "packagesAdded": 4
+    },
+    {
+      "node": "v26.10.0",
+      "command": "npm ci --no-audit --no-fund",
+      "exitCode": 0,
+      "packagesAdded": 4
+    }
+  ],
+  "runs": [
+    {
+      "schemaVersion": 1,
+      "caseId": "undici-dispatch-vs-connect",
+      "node": "v18.20.8",
+      "platform": "darwin",
+      "architecture": "arm64",
+      "undici": "6.29.0",
+      "commits": {
+        "before": "babdbe5e3f8071eab991014969f0c1c572d47d7c",
+        "after": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+        "controlledCore": "3d450931930a5a69f97b6ef27eb9b3f527b3d862"
+      },
+      "experiment": "historical and fixed adapters share an explicit hostfence 1.4.1 override to isolate transport integration; not the historical broken lockfile environment",
+      "coreResolution": {
+        "version": "1.4.1",
+        "path": "node_modules/hostfence",
+        "sharedModuleIdentity": true
+      },
+      "installedAdapters": {
+        "before": {
+          "packageVersionField": "0.9.0",
+          "path": "node_modules/undici-ssrf-before",
+          "sourceSha256": "83b437c1a511de34049a3b57d7b8ffe7f072596737dae05140c273a2883a9306",
+          "isWorkspaceLink": false
+        },
+        "after": {
+          "packageVersionField": "0.9.1",
+          "path": "node_modules/undici-ssrf-after",
+          "sourceSha256": "ae65cb74870f5d19b14381ba24d8062372e6b2b2768bdfd4379ceaaceaeb9d2a",
+          "isWorkspaceLink": false
+        }
+      },
+      "fixtureSha256": "14a708dcd2738d078e1ef1d0828adefb1bf6815f214a674c2af018024a934863",
+      "lockfileSha256": "44e953e899b6202cf57687113d420ea95ad287fff94db5cdbef7ed6daabedd9e",
+      "networkModel": "deterministic policy lookups and constructor-level secondary resolver; all real sockets are loopback; no public DNS rebind",
+      "assertionsPassed": true,
+      "cases": [
+        {
+          "case": "historical-request-lookup-ignored",
+          "outcome": "reproduced",
+          "policy": "strict defaults",
+          "adapterCommit": "babdbe5e3f8071eab991014969f0c1c572d47d7c",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "93.184.216.34"
+          ],
+          "assignedPin": {
+            "address": "93.184.216.34",
+            "family": 4
+          },
+          "policyLookups": 1,
+          "constructorLookupAnswer": "127.0.0.1",
+          "constructorLookups": 1,
+          "requestLookupCalls": 0,
+          "sockets": 1,
+          "requests": 1,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        },
+        {
+          "case": "fixed-connection-time-recheck",
+          "outcome": "blocked",
+          "policy": "strict defaults",
+          "adapterCommit": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "93.184.216.34",
+            "127.0.0.1"
+          ],
+          "policyLookups": 2,
+          "errorCode": "HOSTFENCE_BLOCKED",
+          "sockets": 0,
+          "requests": 0,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        },
+        {
+          "case": "fixed-pinned-positive-control",
+          "outcome": "connected",
+          "policy": "explicit test-only allowLoopback",
+          "adapterCommit": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "127.0.0.1",
+            "127.0.0.1"
+          ],
+          "policyLookups": 2,
+          "sockets": 1,
+          "requests": 1,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "caseId": "undici-dispatch-vs-connect",
+      "node": "v26.10.0",
+      "platform": "darwin",
+      "architecture": "arm64",
+      "undici": "6.29.0",
+      "commits": {
+        "before": "babdbe5e3f8071eab991014969f0c1c572d47d7c",
+        "after": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+        "controlledCore": "3d450931930a5a69f97b6ef27eb9b3f527b3d862"
+      },
+      "experiment": "historical and fixed adapters share an explicit hostfence 1.4.1 override to isolate transport integration; not the historical broken lockfile environment",
+      "coreResolution": {
+        "version": "1.4.1",
+        "path": "node_modules/hostfence",
+        "sharedModuleIdentity": true
+      },
+      "installedAdapters": {
+        "before": {
+          "packageVersionField": "0.9.0",
+          "path": "node_modules/undici-ssrf-before",
+          "sourceSha256": "83b437c1a511de34049a3b57d7b8ffe7f072596737dae05140c273a2883a9306",
+          "isWorkspaceLink": false
+        },
+        "after": {
+          "packageVersionField": "0.9.1",
+          "path": "node_modules/undici-ssrf-after",
+          "sourceSha256": "ae65cb74870f5d19b14381ba24d8062372e6b2b2768bdfd4379ceaaceaeb9d2a",
+          "isWorkspaceLink": false
+        }
+      },
+      "fixtureSha256": "14a708dcd2738d078e1ef1d0828adefb1bf6815f214a674c2af018024a934863",
+      "lockfileSha256": "44e953e899b6202cf57687113d420ea95ad287fff94db5cdbef7ed6daabedd9e",
+      "networkModel": "deterministic policy lookups and constructor-level secondary resolver; all real sockets are loopback; no public DNS rebind",
+      "assertionsPassed": true,
+      "cases": [
+        {
+          "case": "historical-request-lookup-ignored",
+          "outcome": "reproduced",
+          "policy": "strict defaults",
+          "adapterCommit": "babdbe5e3f8071eab991014969f0c1c572d47d7c",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "93.184.216.34"
+          ],
+          "assignedPin": {
+            "address": "93.184.216.34",
+            "family": 4
+          },
+          "policyLookups": 1,
+          "constructorLookupAnswer": "127.0.0.1",
+          "constructorLookups": 1,
+          "requestLookupCalls": 0,
+          "sockets": 1,
+          "requests": 1,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        },
+        {
+          "case": "fixed-connection-time-recheck",
+          "outcome": "blocked",
+          "policy": "strict defaults",
+          "adapterCommit": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "93.184.216.34",
+            "127.0.0.1"
+          ],
+          "policyLookups": 2,
+          "errorCode": "HOSTFENCE_BLOCKED",
+          "sockets": 0,
+          "requests": 0,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        },
+        {
+          "case": "fixed-pinned-positive-control",
+          "outcome": "connected",
+          "policy": "explicit test-only allowLoopback",
+          "adapterCommit": "7909f718c9302c053508a1a51cce2c339aa0e7b0",
+          "coreOverrideCommit": "3d450931930a5a69f97b6ef27eb9b3f527b3d862",
+          "policyAnswers": [
+            "127.0.0.1",
+            "127.0.0.1"
+          ],
+          "policyLookups": 2,
+          "sockets": 1,
+          "requests": 1,
+          "hostMatches": true,
+          "peersAreLoopback": true
+        }
+      ]
+    }
+  ]
+}

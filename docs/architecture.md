@@ -18,7 +18,7 @@ flowchart LR
 2. Protocol, credentials, exact-host restrictions and effective port are checked before DNS. A rejected hostname does not trigger a lookup.
 3. IP literals are classified directly. Hostnames use an injectable resolver with a finite waiting time. Empty answers, invalid addresses, lookup errors and timeouts fail closed.
 4. Every address must pass. A public address in a mixed answer does not authorize an accompanying private address. Additional CIDRs are explicit denials, even when a category is otherwise permitted.
-5. `check()` returns the decision, normalized URL, hostname, addresses and reasons. A malformed URL throws `HOSTFENCE_INVALID_URL`. `assert()` also throws for rejected destinations.
+5. `check()` returns the decision, normalized URL, hostname, addresses, reasons, and a nullable pin. Hostname-derived address hints can deny access, but only an actual DNS answer or URL IP literal can authorize a pin. A malformed URL throws `HOSTFENCE_INVALID_URL`. `assert()` also throws for rejected destinations; `assertPin()` returns `{ url, pin }` and rejects with `HOSTFENCE_NO_PIN` if an otherwise accepted destination cannot produce a usable connection pin.
 
 ## Policy composition
 
@@ -31,10 +31,11 @@ Credentials are rejected by default. `allowedPorts`, when provided, uses the eff
 | Component | Enforces | Does not enforce |
 | --- | --- | --- |
 | Core engine | URL policy and all addresses returned by its lookup | Socket destination, redirects, response size |
-| Fetch adapter | Preflight plus rejection of automatic redirect following | DNS pinning, response-body budget |
+| Fetch adapter 1.3.1 | Per-request validation, a dedicated agent pinned to the checked address, rejection of automatic redirects | Response-body budget or safe deployment routing |
 | Webhook guard | Callback destination policy | Delivery, retries, signatures |
 | Preview adapter | Preflight, redirect rejection, HTML response, bounded bytes and waiting | Full HTML parsing, image fetching, DNS pinning |
 | Undici interceptor | Per-dispatch origin checks and handler error delivery | Path/header authorization, socket DNS pinning or downstream backpressure propagation while validation is queued |
+| Undici owned agent 0.9.1 | Per-dispatch checks plus validation and pinning on each new socket; canonical Host and TLS identity | Arbitrary proxy/connector composition, application authorization, or deployment routing |
 | CLI | Repeatable decisions, machine-readable output and exit codes | Sending requests |
 
 DNS may change after validation and before a separate client lookup. `check()` / `assertPin()` return a `DestinationPin`; transports must dial that address with `pinLookup()` so SNI and Host stay on the original name. Check each redirect with `checkHop()`, and keep network-level egress controls. The default resolver's timeout stops waiting; it cannot cancel operating-system resolver work. Do not cache authorization decisions across unrelated requests.
@@ -52,6 +53,6 @@ The scenario suite always uses the default policy. The inspector also provides a
 
 ## Verification strategy
 
-Address and policy tests use fixed vectors. Integration tests replace external fetch/DNS with explicit stubs; the Undici adapter also exercises a real MockAgent. The playground test uses an ephemeral loopback listener to test HTTP behavior without contacting the internet. Tests establish the implemented boundaries, not a claim of universal SSRF prevention.
+Address and policy tests use fixed vectors. The fetch and Undici integration suites combine stubs with actual local sockets; the Undici suite also verifies TLS identity and certificate rejection. The playground uses an ephemeral loopback listener without contacting the internet. The [research experiments](research/README.md) compare exact historical revisions to make the failure and the fix observable. Tests establish the implemented boundaries, not a claim of universal SSRF prevention.
 
 Release notes must call out behavior changes such as credential rejection, invalid-policy errors and redirect restrictions. Existing public function names remain stable; new controls are additive. Transport restrictions that close an unsafe default are described in each adapter's migration notes.

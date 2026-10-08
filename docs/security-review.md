@@ -4,6 +4,12 @@ This review records code-level findings, fixes and remaining boundaries. It is a
 maintainer review of this codebase, not an independent audit, a penetration test
 of a deployed service, or a CVE advisory. The inputs below are local fixtures.
 
+For complete investigations with versioned before/after experiments, see the
+[research case studies](research/README.md):
+
+- [Hostname evidence versus resolved addresses](research/hostname-evidence-vs-dns-pinning.md), fixed in core 1.4.1.
+- [Dispatch options versus the socket connector](research/undici-dispatch-vs-connect.md), addressed by the owned agent in undici-ssrf 0.9.1.
+
 ## Findings and evidence
 
 | Area | Previous behavior | Change | Reproduction / evidence |
@@ -28,6 +34,8 @@ Their companion changes apply the same decisions at application boundaries:
 
 - **hostfence-fetch:** reject automatic redirects; snapshot a native Request
   before asynchronous validation and check cancellation before transport.
+  Version 1.3.1 pairs package Undici Fetch with its own pinned Agent and closes
+  the Agent after the response finishes.
 - **link-preview-safe:** bound waiting and streamed bytes; reject non-HTML and
   failed HTTP responses; cancel rejected bodies; treat extracted metadata as
   untrusted output.
@@ -35,7 +43,8 @@ Their companion changes apply the same decisions at application boundaries:
   and expose structured checks for registration and retry workflows.
 - **undici-ssrf:** return a synchronous dispatcher acceptance value and deliver
   asynchronous validation failures through the handler. Queued validation does
-  not propagate downstream backpressure.
+  not propagate downstream backpressure. Version 0.9.1 keeps that preflight API
+  and adds `createSsrfAgent` for validation and pinning at socket creation.
 - **egress-url-guard:** return structured batch decisions and stable exit codes,
   including malformed URL and input failure cases.
 

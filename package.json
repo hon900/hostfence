@@ -22,6 +22,8 @@
     "prepare": "tsc",
     "prepublishOnly": "npm run build",
     "test": "npm run build && node --test test/*.test.js",
+    "research:install": "npm ci --prefix research/hostname-pinning && npm ci --prefix research/undici-connector",
+    "research": "npm test --prefix research/hostname-pinning && npm test --prefix research/undici-connector",
     "demo": "npm run build && node examples/playground/server.js"
   },
   "engines": {

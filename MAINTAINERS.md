@@ -16,6 +16,7 @@ public issues or sending production credentials with a report.
 | --- | --- | --- |
 | Define the protection boundary | [Security policy](SECURITY.md), [architecture](docs/architecture.md) | Documented guarantees, assumptions, and known limits. |
 | Maintain destination policy | [`src/`](src), [`test/security.test.js`](test/security.test.js) | Implementation and reproducible regression cases. |
+| Investigate implementation failures | [Research case studies](docs/research/README.md), [`research/`](research) | Exact affected/fixed revisions, local reproductions, observed results, and bounded conclusions. |
 | Demonstrate behavior | [Local playground](examples/playground), [HTTP tests](test/playground.test.js) | Deterministic examples and tests of the local interface. |
 | Review changes | [PR template](.github/pull_request_template.md), [governance](GOVERNANCE.md) | A place to record impact, actual checks, and the review decision. |
 | Check distributable packages | [CI workflow](.github/workflows/ci.yml), [package verifier](.github/scripts/verify-package.mjs) | Repeatable tests of the built package in an isolated consumer. |

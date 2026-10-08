@@ -76,6 +76,12 @@ should choose an upstream-supported runtime from the
 A configured matrix is not a completed result: attach the actual CI run and
 verify each job before claiming it passed.
 
+The separate research jobs run `npm run research:install` and `npm run research`
+on Node 18 and 26. They install the exact historical revisions used in the
+[case studies](research/README.md) and assert the failure as well as the fix.
+Recorded evidence snapshots stay unchanged; CI prints a fresh result for its
+own runtime. These jobs supplement the current-source regression suite.
+
 When an integration changes, run that repository's tests and record whether it
 resolved the published dependency or a local core checkout. The local umbrella
 workspace's test runner is useful for combined changes, but a local symlink must
